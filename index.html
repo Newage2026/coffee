@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpaceX Mining Corporation 太空採礦公司</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">    
+    
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .game-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }   
+
+    
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:radial-gradient(white 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.15;
+            z-index: -1;
+            animation: starsMove 100s linear infinite;
+        }
+
+        @keyframes starsMove {
+            from {transform: translateY(0);}
+            to {transform: translateY(-1000px);}
+        } 
+    </style>
+</head>
+
+<body class="text-gray-800 antialiased"> 
+    
+    <!-- Background Music -->
+    <audio id="bg-music" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>  
+    
+    <nav class="bg-[#E60012] text-white sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+
+            <div class="text-2xl font-black tracking-wider flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" 
+                width="28" height="28" viewBox="0 0 24 24" fill="none" 
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+                stroke-linejoin="round">
+                <path d="M5 2h14a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/>
+                <path d="M12 2v20"/>
+                <path d="M8 8h.01"/>
+                <path d="M16 8h.01"/>
+                <path d="M8 12h.01"/>
+                <path d="M16 12h.01"/>
+                <path d="M8 16h.01"/>
+                <path d="M16 16h.01"/></svg>
+                SpaceX Mining Corporation
+            </div>
+
+            <div class="hidden md:flex space-x-6 font-medium">
+                <a href="#" class="hover:text-gray-200 transition">首頁</a>
+                <a href="#games" class="hover:text-gray-200 transition">第1次航班</a>
+                <a href="#games" class="hover:text-gray-200 transition">第2次航班</a>
+                <a href="#about" class="hover:text-gray-200 transition">關於我們</a>
+            </div>
+
+        </div>
+    </nav>
+
+    <header class="bg-gray-900 text-white py-20 relative overflow-hidden">        
+
+        <div class="absolute inset-0 opacity-40 
+        bg-[url('https://images.unsplash.com/photo-1612036782180-6f0b6ce846ce?q=80&w=2070&auto=format&fit=crop')] 
+        bg-cover bg-center"></div>
+
+        <div class="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/90 to-transparent"></div>
+
+        <div class="container mx-auto px-4 relative z-10 flex flex-col items-start md:w-2/3 lg:w-1/2">
+
+            <div class="flex items-center gap-4 mb-4">
+                <span class="bg-[#E60012] text-white text-xs font-bold px-3 py-1 rounded-full">2027</span>
+                <img src="1_Saturn.png" class="w-200 h-200 object-contain animate-pulse"></div>
+
+            <h1 class="text-4xl md:text-6xl font-black mb-4 leading-tight">火星探險隊<br>
+                <span class="text-[#E60012]">燃燒的遠征:黃金.鑽石.礦</span></h1>
+            <p class="text-lg text-gray-300 mb-8">加入我們驚險刺激、史無前例的遠征隊、一場神祕尋寶探險的旅程 就此展開！</p>
+            <a href="#games" class="bg-white text-gray-900 font-bold py-3 px-8 rounded-full 
+            shadow-lg hover:bg-gray-100 transition duration-300">
+                立即報名
+            </a>
+        </div>
+    </header>
+
+    <main id="games" class="container mx-auto px-4 py-12">
+
+        <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900">成為永恆的經典</h2>
+                <p class="text-gray-500 mt-2">將你的英勇事蹟 寫進歷史 永遠流傳下去</p>
+            </div>
+            
+            <div class="flex gap-2 overflow-x-auto no-scrollbar w-full md:w-auto pb-2 md:pb-0" id="filter-container">
+            </div>
+
+        </div>
+
+        <div id="game-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        </div>
+
+    </main>
+
+    
+
+    <div id="game-modal" class="fixed inset-0 bg-black/70 z-[100] 
+    hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl 
+        transform transition-all relative flex flex-col max-h-[90vh]">
+
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-white bg-black/50 
+            rounded-full p-2 hover:bg-black/80 z-20 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" 
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+
+            <div id="modal-header" class="relative h-56 md:h-72 w-full flex-shrink-0">
+            </div>
+
+            <div class="p-6 md:p-8 overflow-y-auto">
+
+                <div class="flex flex-wrap items-center gap-3 mb-4" id="modal-tags">
+                </div>
+
+                <h3 id="modal-title" class="text-2xl md:text-3xl font-bold mb-4 text-gray-900"></h3>
+                <p id="modal-desc" class="text-gray-600 leading-relaxed mb-6 text-lg"></p>
+
+                <div class="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <div>
+
+                        <span class="block text-sm text-gray-500 mb-1">編制人數</span>
+                        <span id="modal-players" class="font-semibold text-gray-800"></span>
+
+                    </div>
+
+                    <div>
+                        <span class="block text-sm text-gray-500 mb-1">啟動日期</span>
+                        <span id="modal-release" class="font-semibold text-gray-800"></span>
+                    </div>
+
+                </div>
+                
+                <div class="mt-8 flex justify-end">
+                    <a href="https://example.com" target="_blank" 
+                    class="bg-[#E60012] text-white px-6 py-2.5 rounded-lg font-bold 
+                    hover:bg-red-700 transition shadow-md inline-block">查看官方網站</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="about" class="bg-gray-900 text-gray-400 py-12 mt-12 border-t border-gray-800">
+        <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+            <div>
+                <h4 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" 
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 2h14a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/>
+                    <path d="M12 2v20"/><path d="M8 8h.01"/><path d="M16 8h.01"/>
+                    <path d="M8 12h.01"/><path d="M16 12h.01"/><path d="M8 16h.01"/><path d="M16 16h.01"/></svg>
+                    SpaceX Mining Corporation
+                </h4>
+                <p class="text-sm">We wish to dream of discovery and exploration, from the earth to the farthest reaches of the galaxy.</p>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold mb-4">快速連結</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-white transition">首頁</a></li>
+                    <li><a href="#games" class="hover:text-white transition">第1次航班</a></li>
+                    <li><a href="#games" class="hover:text-white transition">第2次航班</a></li>
+                    <li><a href="#" class="hover:text-white transition">隱私權政策</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold mb-4">追蹤我們</h4>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center 
+                    hover:bg-[#E60012] hover:text-white transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                    </a>
+                    <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center 
+                    hover:bg-[#E60012] hover:text-white transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                        <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                    </a>
+                    <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center 
+                    hover:bg-[#E60012] hover:text-white transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+        <div class="container mx-auto px-4 mt-8 pt-8 border-t border-gray-800 text-center text-xs">
+            &copy; 2026 SpaceX Mining Corporation. All rights reserved.             
+        </div>
+        
+    </footer>     
+    <!-- GSAP -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =========================
+        // Hero 區塊進場動畫
+        // =========================
+        const heroTimeline = gsap.timeline();
+
+        heroTimeline
+            .from("nav", {
+                y: -80,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out"
+            })
+
+            .from("header img", {
+                scale: 0,
+                rotate: 180,
+                opacity: 0,
+                duration: 1.5,
+                ease: "back.out(1.7)"
+            }, "-=0.5")
+
+            .from("header h1", {
+                y: 80,
+                opacity: 0,
+                duration: 1.2,
+                ease: "power4.out"
+            }, "-=1")
+
+            .from("header p", {
+                y: 30,
+                opacity: 0,
+                duration: 1,
+                ease: "power2.out"
+            }, "-=0.8")
+
+            .from("header a", {
+                scale: 0.7,
+                opacity: 0,
+                duration: 0.8,
+                ease: "elastic.out(1, 0.5)"
+            }, "-=0.6");
+
+
+
+        // =========================
+        // 卡片浮現動畫
+        // =========================
+        gsap.from(".game-card", {
+            scrollTrigger: {
+                trigger: "#game-grid",
+                start: "top 80%",
+            },
+
+            y: 80,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.15,
+            ease: "power3.out"
+        });
+
+
+
+        // =========================
+        // 卡片 Hover 動畫
+        // =========================
+        document.querySelectorAll(".game-card").forEach(card => {
+
+            card.addEventListener("mouseenter", () => {
+
+                gsap.to(card, {
+                    y: -12,
+                    scale: 1.03,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+
+                gsap.to(card.querySelector("img"), {
+                    scale: 1.12,
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+
+            });
+
+            card.addEventListener("mouseleave", () => {
+
+                gsap.to(card, {
+                    y: 0,
+                    scale: 1,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+
+                gsap.to(card.querySelector("img"), {
+                    scale: 1,
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+
+            });
+
+        });
+
+
+
+        // =========================
+        // Modal 開啟動畫
+        // =========================
+        const originalOpenModal = window.openModal;
+
+        window.openModal = (gameId) => {
+
+            originalOpenModal(gameId);
+
+            gsap.fromTo("#game-modal > div",
+                {
+                    scale: 0.7,
+                    y: 80,
+                    opacity: 0,
+                    rotateX: -15
+                },
+                {
+                    scale: 1,
+                    y: 0,
+                    opacity: 1,
+                    rotateX: 0,
+                    duration: 0.8,
+                    ease: "power4.out"
+                }
+            );
+
+        };
+
+
+
+        // =========================
+        // 星空背景流動動畫
+        // =========================
+        gsap.to("body::before", {
+            backgroundPosition: "0px -1000px",
+            duration: 120,
+            repeat: -1,
+            ease: "none"
+        });
+
+
+
+        // =========================
+        // Hero 紅色標題發光動畫
+        // =========================
+        gsap.to(".text-\\[\\#E60012\\]", {
+            textShadow:
+                "0 0 10px rgba(230,0,18,.8), " +
+                "0 0 20px rgba(230,0,18,.8), " +
+                "0 0 40px rgba(230,0,18,.6)",
+
+            repeat: -1,
+            yoyo: true,
+            duration: 1.5,
+            ease: "power1.inOut"
+        });
+
+
+
+        // =========================
+        // Footer 漸入
+        // =========================
+        gsap.from("footer", {
+            scrollTrigger: {
+                trigger: "footer",
+                start: "top 90%"
+            },
+
+            y: 100,
+            opacity: 0,
+            duration: 1.2,
+            ease: "power3.out"
+        });
+
+
+
+        // =========================
+        // 按鈕脈衝動畫
+        // =========================
+        gsap.to("header a", {
+            boxShadow: "0 0 30px rgba(255,255,255,.7)",
+            repeat: -1,
+            yoyo: true,
+            duration: 1.2,
+            ease: "power1.inOut"
+        });
+
+</script>      
+
+    <script>
+        const gamesData = [
+            {
+                id: 1,
+                title: "太空飛行1: 彌賽亞號",
+                genre: "星際旅行",
+                requirements: ["SpaceShip command", "Space Navigation", "LongRange Communication"],
+                release: "2027-01-15",
+                desc: "在廣闊寧靜的銀河系展開冒險，運用全新鈦合金打造的彌賽亞號，勇敢航向未知的星球，探索、挑戰、揭開火星的祕密。",                
+                image: "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&w=800&q=80", // 色彩豐富/登陸火星                
+                gradient: "from-green-600 to-teal-800",
+                textColor: "text-green-800"
+            },
+            {
+                id: 2,
+                title: "登陸火星 搭建營地",
+                genre: "建築工程",
+                requirements: ["SpaceShip commander", "HighLevel management", "Architecture"],
+                release: "2027-04-15",
+                desc: "充滿驚奇與變化的未知星球，彌賽亞號觸碰地表的那一瞬間，人類歷史展開新的篇章。",
+                image: "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=800&q=80", // 風景/搭建營地            
+                gradient: "from-red-500 to-rose-700",
+                textColor: "text-red-800"
+            },
+            {
+                id: 3,
+                title: "發電廠: 組裝太陽能板 佈置電網",
+                genre: "基礎工業",
+                requirements: ["SolarGenerator", "ColdFusion", "NuclearReactor"],
+                release: "2027-07-15",
+                desc: "移居荒蕪的星球，架設太陽能板發電，瞬間進化到21世紀的時代。佈置電網、規劃礦場、收集資源。",
+                image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80", // 科技/發電廠                                 
+                gradient: "from-cyan-400 to-blue-500",
+                textColor: "text-blue-800"
+            },
+            {
+                id: 4,
+                title: "採礦無人機部隊: 壓碎礦石、篩選金屬",
+                genre: "基礎工業",
+                requirements: ["Mining Management", "Spectrum Analyzer", "Caterpillar Conveyor"],
+                release: "2027-10-15",
+                desc: "採集各種礦石、壓碎岩石、分類工業金屬、堆放建築砂石、收集珍稀元素運回地球，換取設備補給。",
+                image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80", // 自然/砂石場
+                gradient: "from-blue-600 to-indigo-800",
+                textColor: "text-indigo-800"
+            },
+            {
+                id: 5,
+                title: "太空飛行2: 阿提米絲號",
+                genre: "星際旅行",
+                requirements: ["SpaceShip command", "Space Navigation", "LongRange Communication"],
+                release: "2028-01-15",
+                desc: "在廣闊寧靜的銀河系再次展開冒險。運用更新技術打造的阿提米絲號，充滿敬意追尋前輩的足跡，及時的補給、挖掘火星的潛力。",
+                image: "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&w=800&q=80", // 色彩豐富/登陸火星                
+                gradient: "from-yellow-400 to-orange-500",
+                textColor: "text-orange-800"
+            },
+            {
+                id: 6,
+                title: "電弧煉鋼廠: 熱壓成型鋼",
+                genre: "基礎工業",
+                requirements: ["ElectricArc Furnace", "ElectroMagnetic Induction", "ColdForged"],
+                release: "2028-04-15",
+                desc: "全力推進金屬冶煉，打造礦場機械的輕合金來源，也提供廠房建築的結構型鋼。",
+                image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80", // 自然/煉鋼廠
+                gradient: "from-gray-700 to-black",
+                textColor: "text-gray-800"
+            },
+            {
+                id: 7,
+                title: "研發部: CNC金屬加工中心",
+                genre: "超級工廠",
+                requirements: ["Physics", "Chemistry", "Machinery Engineering", "Factory Automation", "CAD-CAM"],
+                release: "2028-07-15",
+                desc: "來自於地球的CAD、CAM頂尖工業製造技術，複刻重現在新世界，彈性化全自動金屬加工成型。",
+                image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80", // 科技/加工場
+                gradient: "from-purple-500 to-fuchsia-700",
+                textColor: "text-purple-800"
+            },
+            {
+                id: 8,
+                title: "隕石坑: 地下熔岩洞基地",
+                genre: "建築工程",
+                requirements: ["SpaceShip commander", "HighLevel management", "Architecture"],
+                release: "2028-10-15",
+                desc: "傳承自地球的文明與建築科技，鬼斧神工般的鑲入新世界的隕石坑洞，隔間載重牆撐起 抵擋紫外線的屋頂，之下的安全避風港「我們的家」。",
+                image: "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=800&q=80", // 風景/建造殖民地                
+                gradient: "from-pink-400 to-rose-400",
+                textColor: "text-pink-800"
+            }
+        ];
+        
+
+        let currentFilter = '全部';
+
+        const getGenres = () => {
+            const genres = new Set(gamesData.map(game => game.genre));
+            return ['全部', ...Array.from(genres)];
+        };
+
+        const renderFilters = () => {
+            const filterContainer = document.getElementById('filter-container');
+            const genres = getGenres();
+            
+            filterContainer.innerHTML = genres.map(genre => {
+                const isActive = genre === currentFilter;
+                const baseClasses = "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors duration-200 focus:outline-none";
+                const activeClasses = isActive ? "bg-[#E60012] text-white shadow-md" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50";
+                
+                return `<button onclick="setFilter('${genre}')" class="${baseClasses} ${activeClasses}">${genre}</button>`;
+            }).join('');
+        };
+
+        window.setFilter = (genre) => {
+            currentFilter = genre;
+            renderFilters();
+            renderGames();
+        };
+
+        const renderGames = () => {
+            const grid = document.getElementById('game-grid');
+            
+            const filteredGames = currentFilter === '全部' 
+                ? gamesData 
+                : gamesData.filter(game => game.genre === currentFilter);
+
+            if (filteredGames.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">找不到符合條件的遊戲</div>`;
+                return;
+            }
+
+            grid.innerHTML = filteredGames.map(game => `
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 game-card flex flex-col h-full cursor-pointer group" onclick="openModal(${game.id})">
+                    
+                    <div class="relative h-48 w-full overflow-hidden bg-gray-100">
+                        <img src="${game.image}" alt="${game.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'w-full h-full bg-gradient-to-br ${game.gradient}\\'></div>';">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80"></div>
+                        <h3 class="absolute bottom-3 left-4 right-4 text-white text-xl font-black text-shadow-sm z-10 line-clamp-1">${game.title}</h3>
+                        <div class="absolute top-3 right-3 bg-black/50 backdrop-blur-md text-white text-xs px-2.5 py-1 rounded-md border border-white/20">
+                            ${game.genre}
+                        </div>
+                    </div>
+
+                    <div class="p-5 flex flex-col flex-grow">
+                        <p class="text-sm text-gray-600 mb-4 line-clamp-3 flex-grow leading-relaxed">${game.desc}</p>
+                        <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
+                        <div class="flex flex-wrap gap-2">
+                            ${game.requirements.map(req => `
+                        <span class="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                            ${req}
+                        </span>
+                            `).join('')}
+                    </div>                         
+
+                            <button class="text-sm font-bold ${game.textColor} group-hover:underline flex items-center gap-1">
+                                查看詳情
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" 
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            `).join('');
+        };
+
+        window.openModal = (gameId) => {
+            const game = gamesData.find(g => g.id === gameId);
+            if (!game) return;
+
+            const modal = document.getElementById('game-modal');
+            const header = document.getElementById('modal-header');
+            const tags = document.getElementById('modal-tags');
+            
+            header.innerHTML = `
+                <img src="${game.image}" alt="${game.title}" class="absolute inset-0 w-full h-full object-cover"
+                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'absolute inset-0 w-full h-full bg-gradient-to-br ${game.gradient}\\'></div>';">
+                <div class="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent"></div>
+            `;
+            
+            tags.innerHTML = `
+                <span class="bg-[#E60012] text-white text-xs px-3 py-1 rounded-full font-medium tracking-wide shadow-sm">${game.genre}</span>
+                <span class="bg-gray-100 text-gray-700 border border-gray-200 text-xs px-3 py-1 rounded-full font-medium">${game.requirements}</span>
+            `;
+            
+            document.getElementById('modal-title').textContent = game.title;
+            document.getElementById('modal-desc').textContent = game.desc;
+            document.getElementById('modal-players').textContent = game.requirements;
+            document.getElementById('modal-release').textContent = game.release;
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            
+        };
+
+        window.closeModal = () => {
+            const modal = document.getElementById('game-modal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+
+        document.getElementById('game-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !document.getElementById('game-modal').classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFilters();
+            renderGames();
+        });
+
+    </script>
+
+    <script>
+    document.addEventListener("click", () => {
+    const music = document.getElementById("bg-music");
+
+    if (music.paused) {
+        music.volume = 0.4; // 40% volume
+        music.play().catch(err => console.log(err));;}
+    }, { once: true });
+    </script>
+</body>
+</html>
